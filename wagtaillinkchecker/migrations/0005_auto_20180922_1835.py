@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('wagtaillinkchecker', '0004_auto_20180829_1922'),
+        ("wagtaillinkchecker", "0004_auto_20180829_1922"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scanlink',
-            name='url',
+            model_name="scanlink",
+            name="url",
             field=models.URLField(max_length=500),
         ),
     ]

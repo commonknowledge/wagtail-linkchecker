@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('wagtaillinkchecker', '0003_store_scan_results'),
+        ("wagtaillinkchecker", "0003_store_scan_results"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scanlink',
-            name='page_slug',
+            model_name="scanlink",
+            name="page_slug",
             field=models.CharField(blank=True, max_length=512, null=True),
         ),
     ]

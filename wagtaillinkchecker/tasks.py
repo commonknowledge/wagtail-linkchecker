@@ -9,27 +9,31 @@ from django.utils import timezone
 
 
 @shared_task
-def check_link(link_pk, run_sync=False, verbosity=1, ):
+def check_link(
+    link_pk,
+    run_sync=False,
+    verbosity=1,
+):
     link = ScanLink.objects.get(pk=link_pk)
     site = link.scan.site
     url = get_url(link.url, link.page, site)
-    link.status_code = url.get('status_code')
+    link.status_code = url.get("status_code")
 
-    if url['error']:
+    if url["error"]:
         link.broken = True
-        link.error_text = url['error_message']
+        link.error_text = url["error_message"]
 
-    elif url['invalid_schema']:
+    elif url["invalid_schema"]:
         link.invalid = True
-        link.error_text = _('Link was invalid')
+        link.error_text = _("Link was invalid")
 
     elif link.page.full_url == link.url:
-        soup = BeautifulSoup(url['response'].content, 'html5lib')
-        anchors = soup.find_all('a')
-        images = soup.find_all('img')
+        soup = BeautifulSoup(url["response"].content, "html5lib")
+        anchors = soup.find_all("a")
+        images = soup.find_all("img")
 
         for anchor in anchors:
-            link_href = anchor.get('href')
+            link_href = anchor.get("href")
             link_href = clean_url(link_href, site)
             if verbosity > 1:
                 print(f"cleaned link_href: {link_href}")
@@ -41,7 +45,7 @@ def check_link(link_pk, run_sync=False, verbosity=1, ):
                     pass
 
         for image in images:
-            image_src = image.get('src')
+            image_src = image.get("src")
             image_src = clean_url(image_src, site)
             if verbosity > 1:
                 print(f"cleaned image_src: {image_src}")

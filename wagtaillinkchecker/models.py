@@ -1,27 +1,22 @@
-from sys import version
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
-from wagtaillinkchecker import utils
-
-if utils.is_wagtail_version_more_than_equal_to_2_0():
-    from wagtail.core.models import Site
-    from wagtail.core.models import Page
-else:
-    from wagtail.wagtailcore.models import Site
-    from wagtail.wagtailcore.models import Page
+from wagtail.models import Site
+from wagtail.models import Page
 
 
 class SitePreferences(models.Model):
     site = models.OneToOneField(
-        Site, unique=True, db_index=True, editable=False, on_delete=models.CASCADE)
+        Site, unique=True, db_index=True, editable=False, on_delete=models.CASCADE
+    )
     automated_scanning = models.BooleanField(
         default=False,
         help_text=_(
-            'Conduct automated sitewide scans for broken links, and send emails if a problem is found.'),
-        verbose_name=_('Automated Scanning')
+            "Conduct automated sitewide scans for broken links, and send emails if a problem is found."
+        ),
+        verbose_name=_("Automated Scanning"),
     )
 
 
@@ -29,7 +24,8 @@ class Scan(models.Model):
     scan_finished = models.DateTimeField(blank=True, null=True)
     scan_started = models.DateTimeField(auto_now_add=True)
     site = models.ForeignKey(
-        Site, db_index=True, editable=False, on_delete=models.CASCADE)
+        Site, db_index=True, editable=False, on_delete=models.CASCADE
+    )
 
     @property
     def is_finished(self):
@@ -39,14 +35,17 @@ class Scan(models.Model):
         return ScanLink.objects.create(scan=self, url=url, page=page)
 
     def result(self):
-        return _('{0} broken links found out of {1} links'.format(self.broken_link_count(), self.links.count()))
+        return _(
+            "{0} broken links found out of {1} links".format(
+                self.broken_link_count(), self.links.count()
+            )
+        )
 
     def __str__(self):
-        return 'Scan - {0}'.format(self.scan_started.strftime('%d/%m/%Y'))
+        return "Scan - {0}".format(self.scan_started.strftime("%d/%m/%Y"))
 
 
 class ScanLinkQuerySet(models.QuerySet):
-
     def valid(self):
         return self.filter(invalid=False)
 
@@ -67,8 +66,7 @@ class ScanLinkQuerySet(models.QuerySet):
 
 
 class ScanLink(models.Model):
-    scan = models.ForeignKey(Scan, related_name='links',
-                             on_delete=models.CASCADE)
+    scan = models.ForeignKey(Scan, related_name="links", on_delete=models.CASCADE)
     url = models.URLField(max_length=500)
 
     # If the link has been crawled
@@ -95,7 +93,7 @@ class ScanLink(models.Model):
     objects = ScanLinkQuerySet.as_manager()
 
     class Meta:
-        unique_together = [('url', 'scan')]
+        unique_together = [("url", "scan")]
 
     def __str__(self):
         return self.url
@@ -116,4 +114,5 @@ class ScanLink(models.Model):
 @receiver(pre_delete, sender=Page)
 def delete_tag(instance, **kwargs):
     ScanLink.objects.filter(page=instance).update(
-        page_deleted=True, page_slug=instance.slug)
+        page_deleted=True, page_slug=instance.slug
+    )
