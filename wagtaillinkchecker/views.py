@@ -3,8 +3,6 @@ from __future__ import print_function
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect, render
 
-from functools import lru_cache
-
 from django.utils.translation import ugettext_lazy as _
 
 from wagtaillinkchecker.forms import SitePreferencesForm
@@ -13,15 +11,7 @@ from wagtaillinkchecker.pagination import paginate
 from wagtaillinkchecker.scanner import broken_link_scan, get_celery_worker_status
 
 from wagtail.admin import messages
-from wagtail.admin.panels import ObjectList, extract_panel_definitions_from_model_class
 from wagtail.models import Site
-
-
-@lru_cache()
-def get_edit_handler(model):
-    panels = extract_panel_definitions_from_model_class(model, ["site"])
-
-    return ObjectList(panels).bind_to(model=model)
 
 
 def scan(request, scan_pk):
@@ -65,7 +55,6 @@ def settings(request):
     instance, created = SitePreferences.objects.get_or_create(site=site)
     form = SitePreferencesForm(instance=instance)
     form.instance.site = site
-    object_list = get_edit_handler(SitePreferences)
 
     if request.method == "POST":
         instance = SitePreferences.objects.filter(site=site).first()
@@ -80,16 +69,12 @@ def settings(request):
             )
     else:
         form = SitePreferencesForm(instance=instance)
-        edit_handler = object_list.bind_to(
-            instance=SitePreferences, form=form, request=request
-        )
 
     return render(
         request,
         "wagtaillinkchecker/settings.html",
         {
             "form": form,
-            "edit_handler": edit_handler,
         },
     )
 

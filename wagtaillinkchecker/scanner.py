@@ -11,9 +11,14 @@ from wagtaillinkchecker import HTTP_STATUS_CODES
 def get_celery_worker_status():
     ERROR_KEY = "ERROR"
     try:
-        from celery.task.control import inspect
+        from celery import current_app
 
-        insp = inspect()
+        broker_url = current_app.conf.broker_url
+        if broker_url.startswith("sqlalchemy"):
+            # Can't get stats with sqlalchemy broker
+            return {}
+
+        insp = current_app.control.inspect()
         d = insp.stats()
         if not d:
             d = {ERROR_KEY: "No running Celery workers were found."}
