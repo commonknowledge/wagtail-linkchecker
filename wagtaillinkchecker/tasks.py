@@ -34,12 +34,25 @@ def check_link_sync(link_pk, verbosity=1):
         soup = BeautifulSoup(url["response"].content, "html5lib")
         anchors = soup.find_all("a")
         images = soup.find_all("img")
+        iframes = soup.find_all("iframe")
 
         for anchor in anchors:
             link_href = anchor.get("href")
             link_href = clean_url(link_href, site)
             if verbosity > 1:
                 print(f"cleaned link_href: {link_href}")
+            if link_href:
+                try:
+                    new_link = link.scan.add_link(page=link.page, url=link_href)
+                    new_link.check_link(verbosity)
+                except IntegrityError:
+                    pass
+
+        for iframe in iframes:
+            link_href = iframe.get("src")
+            link_href = clean_url(link_href, site)
+            if verbosity > 1:
+                print(f"cleaned iframe link_href: {link_href}")
             if link_href:
                 try:
                     new_link = link.scan.add_link(page=link.page, url=link_href)
