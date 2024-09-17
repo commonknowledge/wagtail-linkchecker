@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from wagtaillinkchecker.forms import SitePreferencesForm
 from wagtaillinkchecker.models import SitePreferences, Scan
 from wagtaillinkchecker.pagination import paginate
-from wagtaillinkchecker.scanner import broken_link_scan, get_celery_worker_status
+from wagtaillinkchecker.scanner import broken_link_scan
 
 from wagtail.admin import messages
 from wagtail.models import Site
@@ -81,12 +81,6 @@ def settings(request):
 
 def run_scan(request):
     site = Site.find_for_request(request)
-    celery_status = get_celery_worker_status()
-    if "ERROR" not in celery_status:
-        broken_link_scan(site)
-    else:
-        messages.warning(
-            request, _("No celery workers are running, the scan was not conducted.")
-        )
+    broken_link_scan(site)
 
     return redirect("wagtaillinkchecker")

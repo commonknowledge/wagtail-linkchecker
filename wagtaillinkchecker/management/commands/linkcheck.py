@@ -17,20 +17,14 @@ class Command(BaseCommand):
             action="store_true",
             help="Do not send mails when finding broken links",
         )
-        parser.add_argument(
-            "--run-synchronously",
-            action="store_true",
-            help="Run checks synchronously (avoid the need for Celery)",
-        )
 
     def handle(self, *args, **kwargs):
         site = Site.objects.filter(is_default_site=True).first()
         pages = site.root_page.get_descendants(inclusive=True).live().public()
-        run_sync = kwargs.get("run_synchronously") or False
         verbosity = kwargs.get("verbosity") or 1
 
         print(f"Scanning {len(pages)} pages...")
-        scan = broken_link_scan(site, run_sync, verbosity)
+        scan = broken_link_scan(site, verbosity)
         total_links = ScanLink.objects.filter(scan=scan, crawled=True)
         broken_links = ScanLink.objects.filter(scan=scan, broken=True)
         print(

@@ -16,7 +16,7 @@ setup(
     author="Neon Jungle",
     author_email="developers@neonjungle.studio",
     url="https://github.com/neon-jungle/wagtail-linkchecker/",
-    install_requires=["wagtail>=5.0,<6", "requests>=2.9.1", "celery>=5.0,<6"],
+    install_requires=["wagtail>=5.0,<6", "requests>=2.9.1", "django-background-tasks>=1.2.5,<3"],
     zip_safe=False,
     license="BSD License",
     packages=find_packages(),

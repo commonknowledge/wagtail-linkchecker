@@ -3,7 +3,7 @@ wagtail-linkchecker
 ===================
 
 A tool/plugin to assist with finding broken links on your wagtail site.
-This tool works asynchronously using celery.
+This tool works asynchronously using django-background-task.
 
 Installing
 ==========
@@ -20,10 +20,6 @@ Using
 To use, firstly you will need to add ``wagtaillinkchecker`` to your ``INSTALLED_APPS`` and run the migrations.
 There will now be an extra item on the settings panel of the wagtailadmin. Inside here you can enable or disable automated
 scanning (See below for more detail) or conduct a scan.
-
-For scans to be conducted from the admin, you must be running a celery daemon.
-You can run the celery worker with ``celery -A my_app_name worker -l info``. See the `Celery Documentation <http://docs.celeryproject.org/en/latest/index.html>`_ for more information.
-For production you'll want to run celery as a daemon using something like systemd. See `Celery Daemonization <http://docs.celeryproject.org/en/latest/userguide/daemonizing.html#daemonizing>`_ for more information.
 
 Conducting a scan
 -----------------
@@ -45,9 +41,6 @@ Command options
 
 ``--do-not-send-mail`` 
     Don't send an email to administrators once scan is complete.
-
-``--run-synchronously``
-    Skip celery and run command synchronously (useful for automated scanning)
 
 ``-v 2``
     Show more output in the logs
