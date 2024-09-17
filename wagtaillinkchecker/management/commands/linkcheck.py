@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from wagtaillinkchecker.scanner import broken_link_scan
 from wagtaillinkchecker.models import ScanLink
 
-from wagtail.models import PageRevision, Site
+from wagtail.models import Revision, Site
 
 
 class Command(BaseCommand):
@@ -21,10 +21,10 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         site = Site.objects.filter(is_default_site=True).first()
         pages = site.root_page.get_descendants(inclusive=True).live().public()
-        verbosity = kwargs.get("verbosity") or 1
+        verbosity = 2
 
         print(f"Scanning {len(pages)} pages...")
-        scan = broken_link_scan(site, verbosity)
+        scan = broken_link_scan(site, verbosity, sync=True)
         total_links = ScanLink.objects.filter(scan=scan, crawled=True)
         broken_links = ScanLink.objects.filter(scan=scan, broken=True)
         print(
@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
         messages = []
         for page in pages:
-            revisions = PageRevision.objects.filter(page=page)
+            revisions = page.revisions
             user = None
             user_email = settings.DEFAULT_FROM_EMAIL
             if revisions:
@@ -48,6 +48,8 @@ class Command(BaseCommand):
             for link in broken_links:
                 if link.page == page:
                     page_broken_links.append(link)
+            if not page_broken_links:
+                continue
             email_message = render_to_string(
                 "wagtaillinkchecker/emails/broken_links.html",
                 {

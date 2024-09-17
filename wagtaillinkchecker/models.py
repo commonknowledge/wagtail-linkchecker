@@ -102,8 +102,11 @@ class ScanLink(models.Model):
     def page_is_deleted(self):
         return self.page_deleted and self.page_slug
 
-    def check_link(self, verbosity=1):
-        from wagtaillinkchecker.tasks import check_link
+    def check_link(self, verbosity=1, sync=False):
+        from wagtaillinkchecker.tasks import check_link, check_link_sync
+
+        if sync:
+            return check_link_sync(self.pk, verbosity=verbosity)
 
         check_link(self.pk, verbosity=verbosity)
 
