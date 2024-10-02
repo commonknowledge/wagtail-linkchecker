@@ -13,7 +13,10 @@ def check_link(
     link_pk,
     verbosity=1,
 ):
-    return check_link_sync(link_pk, verbosity=verbosity)
+    try:
+        return check_link_sync(link_pk, verbosity=verbosity)
+    except Exception as e:
+        print(f"Failed to check link {link_pk}: {e}")
 
 
 def check_link_sync(link_pk, verbosity=1):
