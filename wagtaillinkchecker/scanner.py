@@ -64,7 +64,7 @@ def get_url(url, page, site):
     }
     response = None
     try:
-        response = requests.get(url, verify=True)
+        response = requests.get(url, verify=True, timeout=30)
         data["response"] = response
     except (requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema):
         data["invalid_schema"] = True

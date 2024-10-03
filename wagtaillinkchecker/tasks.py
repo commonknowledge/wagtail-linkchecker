@@ -22,8 +22,12 @@ def check_link(
 def check_link_sync(link_pk, verbosity=1):
     link = ScanLink.objects.get(pk=link_pk)
     site = link.scan.site
+    if verbosity > 1:
+        print(f"Checking {link.url}")
     url = get_url(link.url, link.page, site)
     link.status_code = url.get("status_code")
+    if verbosity > 1:
+        print(f"Link is {'broken' if url['error'] else 'OK'}")
 
     if url["error"]:
         link.broken = True
